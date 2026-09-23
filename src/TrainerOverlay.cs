@@ -57,11 +57,18 @@ namespace GregModTrainer
                 if (willShow) BuildContent();
                 TrainerPanel.Toggle();
                 MelonLogger.Msg($"[Trainer] Panel {(TrainerPanel.IsVisible ? "shown." : "hidden.")}");
+                try { if (TrainerGregHost.HasCore) ReportOpenState(); } catch { /* best-effort */ }
             }
             catch (Exception ex)
             {
                 MelonLogger.Error($"[Trainer] Panel toggle failed: {ex.GetBaseException().Message}");
             }
+        }
+
+        // Separate Methode (JIT-Trennung): meldet den Panel-Status ans F1-Hub.
+        private static void ReportOpenState()
+        {
+            try { gregCore.UI.GregMenuRegistry.SetOpen("trainer", IsVisible); } catch { /* best-effort */ }
         }
 
         // Jeden Frame aus TrainerMod.OnUpdate: leitet Mausklicks an sichtbare

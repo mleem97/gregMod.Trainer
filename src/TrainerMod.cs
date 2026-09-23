@@ -109,6 +109,10 @@ namespace GregModTrainer
                 {
                     try { TrainerOverlay.Toggle(); } catch { }
                 });
+                gregCore.UI.GregMenuRegistry.RegisterCloser("trainer", () =>
+                {
+                    try { if (TrainerOverlay.IsVisible) TrainerOverlay.Toggle(); } catch { }
+                });
             }
             catch (Exception ex)
             {
