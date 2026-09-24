@@ -5,12 +5,12 @@ using MelonLoader;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[assembly: MelonInfo(typeof(GregModTrainer.TrainerMod), "gregMod.Trainer", "1.0.3", "TeamGreg Modding")]
+[assembly: MelonInfo(typeof(GregModTrainer.TrainerMod), "gregMod.Trainer", "1.1.0", "TeamGreg Modding")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace GregModTrainer
 {
-    // Laufzeit-Erkennung gregCore (reiner Typname-Lookup, keine harte Abhaengigkeit).
+    // Runtime gregCore detection (type-name lookup only, no hard dependency).
     internal static class TrainerGregHost
     {
         private const string ProbeType = "gregCore.UI.GregNotificationManager, gregCore";
@@ -95,14 +95,14 @@ namespace GregModTrainer
             }
         }
 
-        // Mod-Vertrag + Tasten-HUD + Oeffner fuers F1-Hub. Nur mit gregCore
-        // aufrufen (eigene Methode wegen JIT-Trennung ohne gregCore-DLL).
+        // Mod contract + key HUD + opener for F1 hub. Call only with gregCore
+        // (own method for JIT split without gregCore DLL).
         private void RegisterCoreExtras()
         {
             try
             {
                 gregCore.Core.Mods.GregModRegistry.Register(
-                    "gregMod.Trainer", "Trainer", "1.0.3",
+                    "gregMod.Trainer", "Trainer", "1.1.0",
                     new string[] { "trainer" });
                 gregCore.UI.GregHudRegistry.Register("trainer", ToggleKey.ToString(), "Trainer");
                 gregCore.UI.GregMenuRegistry.RegisterOpener("trainer", () =>
@@ -116,7 +116,7 @@ namespace GregModTrainer
             }
             catch (Exception ex)
             {
-                MelonLogger.Warning("[Trainer] Hub-Registrierung fehlgeschlagen: " + ex.GetBaseException().Message);
+                MelonLogger.Warning("[Trainer] Hub registration failed: " + ex.GetBaseException().Message);
             }
         }
 
