@@ -5,7 +5,7 @@ using MelonLoader;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[assembly: MelonInfo(typeof(GregModTrainer.TrainerMod), "gregMod.Trainer", "1.1.0", "TeamGreg Modding")]
+[assembly: MelonInfo(typeof(GregModTrainer.TrainerMod), "gregMod.Trainer", "1.1.1", "TeamGreg Modding")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace GregModTrainer
@@ -102,7 +102,7 @@ namespace GregModTrainer
             try
             {
                 gregCore.Core.Mods.GregModRegistry.Register(
-                    "gregMod.Trainer", "Trainer", "1.1.0",
+                    "gregMod.Trainer", "Trainer", "1.1.1",
                     new string[] { "trainer" });
                 gregCore.UI.GregHudRegistry.Register("trainer", ToggleKey.ToString(), "Trainer");
                 gregCore.UI.GregMenuRegistry.RegisterOpener("trainer", () =>
