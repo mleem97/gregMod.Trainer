@@ -1,0 +1,47 @@
+{
+  "pref.togglekey.name": "Trainer Toggle Key",
+  "pref.togglekey.desc": "Input System key to open/close the trainer panel (e.g. F7, F8, Backquote).",
+  "pref.noexpenses.name": "No Expenses",
+  "pref.noexpenses.desc": "Blocks all money deductions (shop purchases, repairs, salaries).",
+  "pref.xps.name": "XP/s",
+  "pref.xps.desc": "Continuously grants the configured XP each second.",
+  "pref.xprate.name": "XP per second",
+  "pref.xprate.desc": "Amount of XP granted per second while XP/s is enabled.",
+  "pref.income.name": "Income/s",
+  "pref.income.desc": "Continuously grants the configured amount of money each second.",
+  "pref.incomerate.name": "Income per second",
+  "pref.incomerate.desc": "Amount of money granted per second while Income/s is enabled.",
+
+  "log.loaded": "Loaded. Press {0} to open the trainer panel.",
+
+  "panel.title": "TRAINER",
+  "section.player": "Player",
+  "section.economy": "Economy",
+  "section.rates": "Rates (per second)",
+  "section.protection": "Protection",
+
+  "value.money": "Money: {0}",
+  "value.money.none": "Money: —",
+  "value.xp": "XP: {0}",
+  "value.xp.none": "XP: —",
+  "value.reputation": "Reputation: {0}",
+  "value.reputation.none": "Reputation: —",
+  "amount": "Amount: {0}/s",
+
+  "stepper.money": "Money",
+  "stepper.xp": "XP",
+  "stepper.reputation": "Reputation",
+  "stepper.xpsamount": "XP/s amount",
+  "stepper.incomeamount": "Income/s amount",
+
+  "rate.xps": "XP/s",
+  "rate.xps.hint": "Continuously grants the configured XP each second while the panel is open.",
+  "rate.income": "Income/s",
+  "rate.income.hint": "Continuously grants the configured money each second while the panel is open.",
+  "toggle.noexpenses": "No Expenses",
+  "toggle.noexpenses.hint": "Blocks all money deductions (shop purchases, repairs, salaries).",
+  "toggle.on": "ON",
+  "toggle.off": "OFF",
+
+  "panel.close": "Close ({0})"
+}

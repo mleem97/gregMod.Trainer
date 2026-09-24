@@ -1,0 +1,47 @@
+{
+  "pref.togglekey.name": "Trainer-Umschalttaste",
+  "pref.togglekey.desc": "Input-System-Taste zum Oeffnen/Schliessen des Trainer-Panels (z. B. F7, F8, Backquote).",
+  "pref.noexpenses.name": "Keine Ausgaben",
+  "pref.noexpenses.desc": "Blockiert alle Geldabzuege (Shop-Kaeufe, Reparaturen, Gehaelter).",
+  "pref.xps.name": "XP/s",
+  "pref.xps.desc": "Gewaehrt fortlaufend die eingestellte XP pro Sekunde.",
+  "pref.xprate.name": "XP pro Sekunde",
+  "pref.xprate.desc": "Menge an XP pro Sekunde, solange XP/s aktiv ist.",
+  "pref.income.name": "Einkommen/s",
+  "pref.income.desc": "Gewaehrt fortlaufend den eingestellten Geldbetrag pro Sekunde.",
+  "pref.incomerate.name": "Einkommen pro Sekunde",
+  "pref.incomerate.desc": "Geldbetrag pro Sekunde, solange Einkommen/s aktiv ist.",
+
+  "log.loaded": "Geladen. Druecke {0} zum Oeffnen des Trainer-Panels.",
+
+  "panel.title": "TRAINER",
+  "section.player": "Spieler",
+  "section.economy": "Wirtschaft",
+  "section.rates": "Raten (pro Sekunde)",
+  "section.protection": "Schutz",
+
+  "value.money": "Geld: {0}",
+  "value.money.none": "Geld: —",
+  "value.xp": "XP: {0}",
+  "value.xp.none": "XP: —",
+  "value.reputation": "Ruf: {0}",
+  "value.reputation.none": "Ruf: —",
+  "amount": "Menge: {0}/s",
+
+  "stepper.money": "Geld",
+  "stepper.xp": "XP",
+  "stepper.reputation": "Ruf",
+  "stepper.xpsamount": "XP/s-Menge",
+  "stepper.incomeamount": "Einkommen/s-Menge",
+
+  "rate.xps": "XP/s",
+  "rate.xps.hint": "Gewaehrt fortlaufend die eingestellte XP pro Sekunde, solange das Panel offen ist.",
+  "rate.income": "Einkommen/s",
+  "rate.income.hint": "Gewaehrt fortlaufend den eingestellten Geldbetrag pro Sekunde, solange das Panel offen ist.",
+  "toggle.noexpenses": "Keine Ausgaben",
+  "toggle.noexpenses.hint": "Blockiert alle Geldabzuege (Shop-Kaeufe, Reparaturen, Gehaelter).",
+  "toggle.on": "AN",
+  "toggle.off": "AUS",
+
+  "panel.close": "Schliessen ({0})"
+}

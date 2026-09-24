@@ -4,6 +4,7 @@ using Il2Cpp;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.InputSystem;
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ModCoverage.Tests")]
 
 [assembly: MelonInfo(typeof(GregModTrainer.TrainerMod), "gregMod.Trainer", "1.1.1", "TeamGreg Modding")]
 [assembly: MelonGame("Waseku", "Data Center")]
@@ -61,18 +62,24 @@ namespace GregModTrainer
                 Instance = this;
 
                 var cat = MelonPreferences.CreateCategory("gregMod.Trainer", "Trainer");
-                ToggleKeyEntry = cat.CreateEntry("ToggleKey", "F7", "Trainer Toggle Key",
-                    "Input System key to open/close the trainer panel (e.g. F7, F8, Backquote).");
-                NoExpensesEntry = cat.CreateEntry("NoExpenses", false, "No Expenses",
-                    "Blocks all money deductions (shop purchases, repairs, salaries).");
-                XpPerSecEnabledEntry = cat.CreateEntry("XpPerSecEnabled", false, "XP/s",
-                    "Continuously grants the configured XP each second.");
-                XpPerSecEntry = cat.CreateEntry("XpPerSec", 1000f, "XP per second",
-                    "Amount of XP granted per second while XP/s is enabled.");
-                IncomePerSecEnabledEntry = cat.CreateEntry("IncomePerSecEnabled", false, "Income/s",
-                    "Continuously grants the configured amount of money each second.");
-                IncomePerSecEntry = cat.CreateEntry("IncomePerSec", 500f, "Income per second",
-                    "Amount of money granted per second while Income/s is enabled.");
+                ToggleKeyEntry = cat.CreateEntry("ToggleKey", "F7",
+                    TrainerLang.T("pref.togglekey.name", "Trainer Toggle Key"),
+                    TrainerLang.T("pref.togglekey.desc", "Input System key to open/close the trainer panel (e.g. F7, F8, Backquote)."));
+                NoExpensesEntry = cat.CreateEntry("NoExpenses", false,
+                    TrainerLang.T("pref.noexpenses.name", "No Expenses"),
+                    TrainerLang.T("pref.noexpenses.desc", "Blocks all money deductions (shop purchases, repairs, salaries)."));
+                XpPerSecEnabledEntry = cat.CreateEntry("XpPerSecEnabled", false,
+                    TrainerLang.T("pref.xps.name", "XP/s"),
+                    TrainerLang.T("pref.xps.desc", "Continuously grants the configured XP each second."));
+                XpPerSecEntry = cat.CreateEntry("XpPerSec", 1000f,
+                    TrainerLang.T("pref.xprate.name", "XP per second"),
+                    TrainerLang.T("pref.xprate.desc", "Amount of XP granted per second while XP/s is enabled."));
+                IncomePerSecEnabledEntry = cat.CreateEntry("IncomePerSecEnabled", false,
+                    TrainerLang.T("pref.income.name", "Income/s"),
+                    TrainerLang.T("pref.income.desc", "Continuously grants the configured amount of money each second."));
+                IncomePerSecEntry = cat.CreateEntry("IncomePerSec", 500f,
+                    TrainerLang.T("pref.incomerate.name", "Income per second"),
+                    TrainerLang.T("pref.incomerate.desc", "Amount of money granted per second while Income/s is enabled."));
                 cat.SaveToFile(false);
 
                 if (Enum.TryParse<Key>(ToggleKeyEntry.Value, true, out var k) && k != Key.None)
@@ -83,7 +90,10 @@ namespace GregModTrainer
                 NoExpensesNow = NoExpensesEntry.Value;
 
                 TrainerOverlay.EnsureRegistered();
-                LoggerInstance.Msg($"[Trainer] Loaded. Press {ToggleKey} to open the trainer panel.");
+                // Live value labels follow gregCore language switches; full panel
+                // text rebuilds on next open (BuildContent). No-op without gregCore.
+                try { TrainerLang.RefreshOnLanguageChanged(TrainerOverlay.RefreshLabels); } catch { /* best-effort */ }
+                LoggerInstance.Msg("[Trainer] " + TrainerLang.T("log.loaded", "Loaded. Press {0} to open the trainer panel.", ToggleKey));
                 if (TrainerGregHost.HasCore)
                 {
                     try { RegisterCoreExtras(); } catch { }
@@ -104,6 +114,7 @@ namespace GregModTrainer
                 gregCore.Core.Mods.GregModRegistry.Register(
                     "gregMod.Trainer", "Trainer", "1.1.1",
                     new string[] { "trainer" });
+                try { RegisterCoreToggle(); } catch { /* polling fallback below */ }
                 gregCore.UI.GregHudRegistry.Register("trainer", ToggleKey.ToString(), "Trainer");
                 gregCore.UI.GregMenuRegistry.RegisterOpener("trainer", () =>
                 {
@@ -120,6 +131,59 @@ namespace GregModTrainer
             }
         }
 
+        internal static bool CoreHandlesToggle = false;
+
+        // Key contract with gregCore: toggle goes into the central keybind
+        // registry (collision-free via auto-resolve). gregCore then polls
+        // itself — own polling below is disabled (no double toggle).
+        // Call only with gregCore (JIT separation).
+        private static void RegisterCoreToggle()
+        {
+            var registry = gregCore.GameLayer.Bootstrap.GregServiceContainer
+                .Get<gregCore.Infrastructure.Settings.GregKeybindRegistry>();
+            if (registry == null) return;
+
+            UnityEngine.KeyCode defaultCode = UnityEngine.KeyCode.F7;
+            try
+            {
+                if (System.Enum.TryParse<UnityEngine.KeyCode>(ToggleKey.ToString(), out var parsed))
+                    defaultCode = parsed;
+            }
+            catch { /* keep F7 */ }
+
+            registry.Register(new gregCore.Infrastructure.Settings.Models.KeybindEntry
+            {
+                ModId = "gregMod.Trainer",
+                ActionId = "toggle",
+                DisplayName = "Trainer panel",
+                Description = "Opens/closes the trainer panel.",
+                Category = "Panels",
+                DefaultKey = defaultCode,
+                CurrentKey = defaultCode,
+                OnPress = () =>
+                {
+                    try { if (!IsPauseMenuActive()) TrainerOverlay.Toggle(); } catch { /* best-effort */ }
+                },
+            });
+
+            // Adopt the effective (possibly auto-resolved) key: HUD,
+            // panel labels and close button show the real key.
+            try
+            {
+                var effective = registry.Get("gregMod.Trainer", "toggle");
+                if (effective != null && effective.CurrentKey != UnityEngine.KeyCode.None
+                    && System.Enum.TryParse<Key>(effective.CurrentKey.ToString(), true, out var k) && k != Key.None)
+                {
+                    if (k != ToggleKey)
+                        MelonLogger.Msg($"[Trainer] Toggle key auto-resolved: {ToggleKey} -> {k} (collision-free).");
+                    ToggleKey = k;
+                }
+            }
+            catch { /* keep pref key */ }
+
+            CoreHandlesToggle = true;
+        }
+
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
             PlayerRef.Clear();
@@ -130,13 +194,18 @@ namespace GregModTrainer
             try { TrainerInputLock.Refresh(); } catch { /* best-effort */ }
             try { TrainerOverlay.RouteClicks(); } catch { /* best-effort */ }
 
-            try
+            // Own polling only without the gregCore keybind contract: with
+            // the contract gregCore polls itself (otherwise double toggle).
+            if (!CoreHandlesToggle)
             {
-                var kb = Keyboard.current;
-                if (kb != null && kb[ToggleKey].wasPressedThisFrame && !IsPauseMenuActive())
-                    TrainerOverlay.Toggle();
+                try
+                {
+                    var kb = Keyboard.current;
+                    if (kb != null && kb[ToggleKey].wasPressedThisFrame && !IsPauseMenuActive())
+                        TrainerOverlay.Toggle();
+                }
+                catch { /* input best-effort */ }
             }
-            catch { /* input best-effort */ }
 
             if (TrainerOverlay.IsVisible)
             {

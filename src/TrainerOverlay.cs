@@ -54,7 +54,12 @@ namespace GregModTrainer
                     return;
                 }
                 bool willShow = !TrainerPanel.IsVisible;
-                if (willShow) BuildContent();
+                if (willShow)
+                {
+                    BuildContent();
+                    // Re-attempt event subscription (covers gregCore loading later).
+                    try { TrainerLang.RefreshOnLanguageChanged(RefreshLabels); } catch { /* best-effort */ }
+                }
                 TrainerPanel.Toggle();
                 MelonLogger.Msg($"[Trainer] Panel {(TrainerPanel.IsVisible ? "shown." : "hidden.")}");
                 try { if (TrainerGregHost.HasCore) ReportOpenState(); } catch { /* best-effort */ }
@@ -120,15 +125,21 @@ namespace GregModTrainer
             {
                 var player = PlayerRef.Current;
                 if (_moneyVal != null)
-                    _moneyVal.text = player == null ? "Money: —" : $"Money: {player.money:F0}";
+                    _moneyVal.text = player == null
+                        ? TrainerLang.T("value.money.none", "Money: —")
+                        : TrainerLang.T("value.money", "Money: {0}", player.money.ToString("F0"));
                 if (_xpVal != null)
-                    _xpVal.text = player == null ? "XP: —" : $"XP: {player.xp:F0}";
+                    _xpVal.text = player == null
+                        ? TrainerLang.T("value.xp.none", "XP: —")
+                        : TrainerLang.T("value.xp", "XP: {0}", player.xp.ToString("F0"));
                 if (_repVal != null)
-                    _repVal.text = player == null ? "Reputation: —" : $"Reputation: {player.reputation:F1}";
+                    _repVal.text = player == null
+                        ? TrainerLang.T("value.reputation.none", "Reputation: —")
+                        : TrainerLang.T("value.reputation", "Reputation: {0}", player.reputation.ToString("F1"));
                 if (_xpRateAmount != null)
-                    _xpRateAmount.text = $"Amount: {TrainerMod.XpPerSecEntry.Value:F0}/s";
+                    _xpRateAmount.text = TrainerLang.T("amount", "Amount: {0}/s", TrainerMod.XpPerSecEntry.Value.ToString("F0"));
                 if (_incomeRateAmount != null)
-                    _incomeRateAmount.text = $"Amount: {TrainerMod.IncomePerSecEntry.Value:F0}/s";
+                    _incomeRateAmount.text = TrainerLang.T("amount", "Amount: {0}/s", TrainerMod.IncomePerSecEntry.Value.ToString("F0"));
                 RefreshToggleBtn(_xpRateBtn, TrainerMod.XpPerSecEnabledEntry.Value);
                 RefreshToggleBtn(_incomeRateBtn, TrainerMod.IncomePerSecEnabledEntry.Value);
                 RefreshToggleBtn(_noExpBtn, TrainerMod.NoExpensesNow);
@@ -144,7 +155,7 @@ namespace GregModTrainer
             if (btn == null) return;
             try
             {
-                btn.text = on ? "ON" : "OFF";
+                btn.text = on ? TrainerLang.T("toggle.on", "ON") : TrainerLang.T("toggle.off", "OFF");
                 if (on) { TrainerPanel.ApplyPrimaryButtonStyle(btn); }
                 else { TrainerPanel.ApplySecondaryButtonStyle(btn); }
             }
@@ -163,38 +174,42 @@ namespace GregModTrainer
             _xpRateAmount = _incomeRateAmount = null;
             _xpRateBtn = _incomeRateBtn = _noExpBtn = null;
 
-            AddHeadline("Player");
-            _moneyVal = AddValueLabel("Money: —");
-            _xpVal = AddValueLabel("XP: —");
-            _repVal = AddValueLabel("Reputation: —");
+            AddHeadline(TrainerLang.T("section.player", "Player"));
+            _moneyVal = AddValueLabel(TrainerLang.T("value.money.none", "Money: —"));
+            _xpVal = AddValueLabel(TrainerLang.T("value.xp.none", "XP: —"));
+            _repVal = AddValueLabel(TrainerLang.T("value.reputation.none", "Reputation: —"));
 
             AddSeparator();
 
-            AddHeadline("Economy");
-            AddStepperRow("Money", 1000f, 10000f, 100000f, TrainerMod.AddCoin);
-            AddStepperRow("XP", 1000f, 10000f, 100000f, TrainerMod.AddXp);
-            AddStepperRow("Reputation", 10f, 100f, 500f, TrainerMod.AddReputation);
+            AddHeadline(TrainerLang.T("section.economy", "Economy"));
+            AddStepperRow(TrainerLang.T("stepper.money", "Money"), 1000f, 10000f, 100000f, TrainerMod.AddCoin);
+            AddStepperRow(TrainerLang.T("stepper.xp", "XP"), 1000f, 10000f, 100000f, TrainerMod.AddXp);
+            AddStepperRow(TrainerLang.T("stepper.reputation", "Reputation"), 10f, 100f, 500f, TrainerMod.AddReputation);
 
             AddSeparator();
 
-            AddHeadline("Rates (per second)");
-            _xpRateBtn = AddToggleBtn("XP/s", "Continuously grants the configured XP each second while the panel is open.",
+            AddHeadline(TrainerLang.T("section.rates", "Rates (per second)"));
+            _xpRateBtn = AddToggleBtn(TrainerLang.T("rate.xps", "XP/s"),
+                TrainerLang.T("rate.xps.hint", "Continuously grants the configured XP each second while the panel is open."),
                 TrainerMod.XpPerSecEnabledEntry.Value, () => TrainerMod.ToggleXpPerSec());
-            _xpRateAmount = AddSteppers("XP/s amount", TrainerMod.XpPerSecEntry.Value, 100f, 1000f, TrainerMod.StepXpPerSec);
+            _xpRateAmount = AddSteppers(TrainerLang.T("stepper.xpsamount", "XP/s amount"), TrainerMod.XpPerSecEntry.Value, 100f, 1000f, TrainerMod.StepXpPerSec);
 
-            _incomeRateBtn = AddToggleBtn("Income/s", "Continuously grants the configured money each second while the panel is open.",
+            _incomeRateBtn = AddToggleBtn(TrainerLang.T("rate.income", "Income/s"),
+                TrainerLang.T("rate.income.hint", "Continuously grants the configured money each second while the panel is open."),
                 TrainerMod.IncomePerSecEnabledEntry.Value, () => TrainerMod.ToggleIncomePerSec());
-            _incomeRateAmount = AddSteppers("Income/s amount", TrainerMod.IncomePerSecEntry.Value, 100f, 1000f, TrainerMod.StepIncomePerSec);
+            _incomeRateAmount = AddSteppers(TrainerLang.T("stepper.incomeamount", "Income/s amount"), TrainerMod.IncomePerSecEntry.Value, 100f, 1000f, TrainerMod.StepIncomePerSec);
 
             AddSeparator();
 
-            AddHeadline("Protection");
-            _noExpBtn = AddToggleBtn("No Expenses", "Blocks all money deductions (shop purchases, repairs, salaries).",
+            AddHeadline(TrainerLang.T("section.protection", "Protection"));
+            _noExpBtn = AddToggleBtn(TrainerLang.T("toggle.noexpenses", "No Expenses"),
+                TrainerLang.T("toggle.noexpenses.hint", "Blocks all money deductions (shop purchases, repairs, salaries)."),
                 TrainerMod.NoExpensesNow, () => TrainerMod.ToggleNoExpenses());
 
             AddSeparator();
 
-            AddBtn(_content, $"Close ({TrainerMod.ToggleKey})", () => { try { Toggle(); } catch { /* best-effort */ } }, false);
+            AddBtn(_content, TrainerLang.T("panel.close", "Close ({0})", TrainerMod.ToggleKey),
+                () => { try { Toggle(); } catch { /* best-effort */ } }, false);
             ApplyFont();
             RefreshLabels();
         }
@@ -285,7 +300,7 @@ namespace GregModTrainer
             row.Add(textCol);
 
             var btn = new Button();
-            btn.text = isOn ? "ON" : "OFF";
+            btn.text = isOn ? TrainerLang.T("toggle.on", "ON") : TrainerLang.T("toggle.off", "OFF");
             btn.style.height = 34f;
             btn.style.width = 70f;
             RefreshToggleBtn(btn, isOn);

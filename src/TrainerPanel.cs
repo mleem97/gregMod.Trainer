@@ -131,7 +131,7 @@ namespace GregModTrainer
                 _panel.style.paddingTop = 12f;
                 _panel.style.paddingBottom = 12f;
 
-                _dragHandle = new Label("TRAINER");
+                _dragHandle = new Label(TrainerLang.T("panel.title", "TRAINER"));
                 ApplyTextStyle(_dragHandle, true);
                 _panel.Add(_dragHandle);
 
