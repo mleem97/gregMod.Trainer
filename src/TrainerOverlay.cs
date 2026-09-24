@@ -65,14 +65,14 @@ namespace GregModTrainer
             }
         }
 
-        // Separate Methode (JIT-Trennung): meldet den Panel-Status ans F1-Hub.
+        // Separate method (JIT split): reports panel state to F1 hub.
         private static void ReportOpenState()
         {
             try { gregCore.UI.GregMenuRegistry.SetOpen("trainer", IsVisible); } catch { /* best-effort */ }
         }
 
-        // Jeden Frame aus TrainerMod.OnUpdate: leitet Mausklicks an sichtbare
-        // Buttons weiter (Ersatz fuers fehlende EventSystem).
+        // Every frame from TrainerMod.OnUpdate: forwards mouse clicks to visible
+        // buttons (replacement for missing EventSystem).
         public static void RouteClicks()
         {
             if (!IsVisible || _clickables.Count == 0) return;
@@ -112,7 +112,7 @@ namespace GregModTrainer
             }
         }
 
-        // Live-Werte + Toggle-Zustaende aktualisieren (kein Panel-Rebuild).
+        // Refresh live values + toggle states (no panel rebuild).
         public static void RefreshLabels()
         {
             if (!IsVisible) return;

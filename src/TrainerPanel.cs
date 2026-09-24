@@ -70,9 +70,9 @@ namespace GregModTrainer
         internal static VisualElement Content { get; private set; }
         internal static bool IsVisible => _visible;
 
-        // Konvertiert einen Screen-Space-Punkt (Input-System, Bottom-Left-Ursprung)
-        // in den Panel-Space (worldBound/Ursprung oben-links, inkl. Panel-Scaling).
-        // Fallback auf den naiven Y-Flip, falls das RuntimePanel noch nicht da ist.
+        // Converts a screen-space point (input system, bottom-left origin)
+        // to panel space (worldBound/top-left origin, incl. panel scaling).
+        // Fallback to naive Y-flip if RuntimePanel not ready yet.
         internal static Vector2 ToPanelSpace(Vector2 screenPoint)
         {
             try
@@ -242,9 +242,9 @@ namespace GregModTrainer
             catch { /* best-effort */ }
         }
 
-        // Toolkit-Default-Font ist im IL2CPP-Build unbrauchbar (Text unsichtbar),
-        // daher die erstbeste geladene Game-Font zuweisen (selbst wenn mehrere
-        // Module eine finden bleibt es bei einer, cached).
+        // Toolkit default font is unusable in IL2CPP builds (invisible text),
+        // so assign first loaded game font (even if several
+        // modules find one it stays one, cached).
         internal static Font GameFont
         {
             get

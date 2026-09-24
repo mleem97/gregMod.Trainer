@@ -1,11 +1,11 @@
-// Input-Lock fuer die Trainer-Oeffnung: Solange das Panel sichtbar ist,
-// bleibt der Cursor frei und die Spiel-Inputs sind deaktiviert (PlayerManager-
-// Flags + PlayerInput-Komponenten). Damit bewegen sich Kamera/Movement NICHT
-// weiter, waehrend das Panel offen ist, und Mausklicks erreichen nur das Panel
-// (das Spiel lockt den Cursor sonst pro Frame wieder, was die manuelle
-// Click-Route unbrauchbar macht). Baugleiches Verhalten wie
-// gregCore.UI.GregInputLock (Backplanes/MusicPlayer), aber ohne gregCore-
-// Abhaengigkeit — Wert-Felder gegen Il2Cpp.PlayerManager verifiziert.
+// Input lock for trainer window: while panel is visible,
+// cursor stays free and game inputs disabled (PlayerManager
+// flags + PlayerInput components). So camera/movement do NOT
+// keep going while panel is open, and mouse clicks reach only the panel
+// (game would re-lock cursor each frame, breaking manual
+// click routing). Same behavior as
+// gregCore.UI.GregInputLock (Backplanes/MusicPlayer), but without gregCore
+// dependency — value fields verified against Il2Cpp.PlayerManager.
 using System;
 using System.Collections.Generic;
 using MelonLoader;
@@ -20,7 +20,7 @@ namespace GregModTrainer
         private static bool _applied;
         private static float _nextRescanRealtime;
 
-        // Pro Frame aus TrainerMod.OnUpdate: wendet/loest den Lock automatisch.
+        // Per frame from TrainerMod.OnUpdate: applies/releases lock automatically.
         public static void Refresh()
         {
             try
@@ -77,9 +77,9 @@ namespace GregModTrainer
             {
                 var pm = Il2Cpp.PlayerManager.instance;
                 if (pm == null) return;
-                try { pm.enabledMouseMovement = mouse; } catch { /* Toleranz */ }
-                try { pm.enabledPlayerMovement = movement; } catch { /* Toleranz */ }
-                try { pm.enabledRayLookInteract = rayInteract; } catch { /* Toleranz */ }
+                try { pm.enabledMouseMovement = mouse; } catch { /* tolerance */ }
+                try { pm.enabledPlayerMovement = movement; } catch { /* tolerance */ }
+                try { pm.enabledRayLookInteract = rayInteract; } catch { /* tolerance */ }
             }
             catch { /* best-effort */ }
         }
@@ -90,8 +90,8 @@ namespace GregModTrainer
             SuspendNew();
         }
 
-        // Auch spaeter gespawnte PlayerInputs einsammeln (wiederholt aufrufen).
-        // Objekt-Vollsuche ist teuer: max. 1x/2s.
+        // Also collect later-spawned PlayerInputs (call repeatedly).
+        // Full object search is costly: max 1x/2s.
         private static void SuspendNew()
         {
             float now = 0f;
